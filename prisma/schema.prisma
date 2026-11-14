@@ -1,0 +1,204 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ==========================================
+// USERS AND DISCORD NOTIFICATIONS
+// ==========================================
+
+model User {
+  id            String  @id @default(cuid())
+  discordUserId String  @unique
+  displayName   String?
+  enabled       Boolean @default(true)
+
+  subscriptions UserRouteSubscription[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ==========================================
+// STATIONS
+// ==========================================
+
+model Station {
+  id        String  @id @default(cuid())
+  evaNumber String  @unique
+  ifopt     String?
+  stada     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  localizedNames LocalizedStationName[]
+
+  routesFrom MonitoredRoute[] @relation("RouteOrigin")
+  routesTo   MonitoredRoute[] @relation("RouteDestination")
+}
+
+model LocalizedStationName {
+  id        String @id @default(cuid())
+  stationId String
+  language  String
+  name      String
+
+  station Station @relation(fields: [stationId], references: [id], onDelete: Cascade)
+
+  @@unique([stationId, language])
+}
+
+// ==========================================
+// TRAIN LINES
+// ==========================================
+
+model Line {
+  id   String @id @default(cuid())
+  name String @unique
+
+  createdAt DateTime @default(now())
+
+  routes MonitoredRoute[]
+}
+
+// ==========================================
+// MONITORED ROUTES
+// ==========================================
+
+model MonitoredRoute {
+  id   String @id @default(cuid())
+  name String
+
+  lineId               String
+  originStationId      String
+  destinationStationId String
+
+  enabled Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  line        Line    @relation(fields: [lineId], references: [id])
+  origin      Station @relation("RouteOrigin", fields: [originStationId], references: [id])
+  destination Station @relation("RouteDestination", fields: [destinationStationId], references: [id])
+
+  subscriptions UserRouteSubscription[]
+  observations  DepartureObservation[]
+
+  @@unique([lineId, originStationId, destinationStationId])
+  @@index([enabled])
+}
+
+// ==========================================
+// ROUTE SCHEDULES
+// ==========================================
+
+// ==========================================
+// USER SUBSCRIPTIONS
+// ==========================================
+
+model UserRouteSubscription {
+  id                    String  @id @default(cuid())
+  userId                String
+  routeId               String
+  enabled               Boolean @default(true)
+  delayThresholdMinutes Int     @default(10)
+  notifyCancellations   Boolean @default(true)
+  notifyReplacementBus  Boolean @default(true)
+  notifyPlatformChanges Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  route     MonitoredRoute             @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  schedules UserNotificationSchedule[]
+
+  @@unique([userId, routeId])
+  @@index([routeId, enabled])
+}
+
+model UserNotificationSchedule {
+  id             String  @id @default(cuid())
+  subscriptionId String
+  weekday        Int
+  startTime      String
+  endTime        String
+  enabled        Boolean @default(true)
+
+  subscription UserRouteSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId, weekday, enabled])
+}
+
+// ==========================================
+// DEPARTURE OBSERVATIONS
+// ==========================================
+
+model DepartureObservation {
+  id      String @id @default(cuid())
+  routeId String
+
+  // References from the DB API
+  journeyId   String
+  departureId String?
+
+  // Local service date, e.g. 2026-11-14
+  serviceDate String
+
+  scheduledDeparture DateTime
+  estimatedDeparture DateTime?
+
+  delayMinutes Int?
+
+  // Examples: SCHEDULED, DELAYED, CANCELLED,
+  // REPLACEMENT_BUS, DEPARTED, ARRIVED
+  status String @default("SCHEDULED")
+
+  platform          String?
+  estimatedPlatform String?
+
+  lastSeenAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  route MonitoredRoute @relation(fields: [routeId], references: [id], onDelete: Cascade)
+
+  alerts TrainAlert[]
+
+  @@unique([journeyId, serviceDate])
+  @@index([routeId, serviceDate])
+  @@index([status])
+}
+
+// ==========================================
+// ALERT HISTORY
+// ==========================================
+
+model TrainAlert {
+  id            String @id @default(cuid())
+  observationId String
+
+  // Examples: DELAY, CANCELLATION, REPLACEMENT_BUS,
+  // PLATFORM_CHANGE, SERVICE_RESTORED
+  alertType String
+
+  // Used to prevent duplicate notifications.
+  dedupeKey String @unique
+
+  message   String
+  sentAt    DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  observation DepartureObservation @relation(fields: [observationId], references: [id], onDelete: Cascade)
+
+  @@index([observationId, alertType])
+}
