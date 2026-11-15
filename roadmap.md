@@ -534,7 +534,7 @@ DATABASE_URL="file:./prisma/dev.db"
 CHECK_INTERVAL_MINUTES=2
 ```
 
-Note: `DATABASE_URL` is the single source of truth. `prisma.config.ts` reads it with `env('DATABASE_URL')` (loaded via `dotenv`), and the application reads it through `src/config/env.ts`. In Prisma 7, relative SQLite paths resolve from the `prisma.config.ts` directory (the project root), so `file:./prisma/dev.db` places the database at `prisma/dev.db`.
+Note: `DATABASE_URL` is the single source of truth. `prisma.config.ts` reads it from `process.env.DATABASE_URL` (loaded via `dotenv`), and the application reads it through `src/config/env.ts`. In Prisma 7, relative SQLite paths resolve from the `prisma.config.ts` directory (the project root), so `file:./prisma/dev.db` places the database at `prisma/dev.db`.
 
 ## 10.2 Runtime configuration
 
@@ -684,7 +684,7 @@ Tasks:
 - [ ] Create application entry point.
 - [ ] Establish logging and graceful shutdown.
 
-Proposed additions (pending maintainer confirmation, see §16.6):
+Proposed additions (pending maintainer confirmation, see §16.4):
 
 - [ ] _(proposed)_ Add a `Dockerfile` (multi-stage, Node LTS, runs migrations then starts the app).
 - [ ] _(proposed)_ Add `docker-compose.yml` with a volume for the SQLite database and `env_file: .env`.
@@ -904,34 +904,21 @@ This will let the project grow from a small train-monitoring script into a multi
 
 # 16. Proposed additions (pending maintainer confirmation)
 
-> Proposed by @iamAdarshh. Nothing below is agreed yet — each item can be accepted, changed or
+> Proposed by @iamAdarshh. Nothing below is agreed yet. Each item can be accepted, changed or
 > dropped independently. Once accepted, items can move into the relevant phase above.
 
-## 16.1 AI-assisted development setup — included in this PR
-
-Shared Claude Code configuration so contributors using AI tools get the same project context and
-conventions. Contributors who don't use Claude Code can ignore it; `REVIEW.md` is useful for
-human reviews too.
-
-- [x] `CLAUDE.md`: project overview, commands, conventions, domain rules, security rules
-- [x] `REVIEW.md`: review checklist (train logic, notifications, reliability, security, data model)
-- [x] `.claude/settings.json`: safe command permissions, blocks reading `.env` and `dev.db`,
-      auto-formats edited files with Prettier / `prisma format`
-- [x] Skills: `prisma-change`, `db-api`, `review-changes`, `roadmap-task`
-- [x] Agent: `code-reviewer` (independent read-only review before a PR)
-- [x] Personal files (`.claude/settings.local.json`, `CLAUDE.local.md`) are git-ignored
-
-## 16.1a Configuration fixes — included in this PR
+## 16.1 Configuration fixes (included in this PR)
 
 - [x] Add `dotenv` to dependencies (`prisma.config.ts` already imported it)
-- [x] Use `DATABASE_URL` as the single database URL (`env('DATABASE_URL')` in `prisma.config.ts`);
-      default changed to `file:./prisma/dev.db` so the DB lands in `prisma/` under Prisma 7
+- [x] Use `DATABASE_URL` as the single database URL (`prisma.config.ts` reads
+      `process.env.DATABASE_URL`); default changed to `file:./prisma/dev.db` so the DB lands in
+      `prisma/` under Prisma 7
 - [x] `src/config/env.ts`: validated config via `getConfig()` (Zod can replace this later)
 - [x] `discord.ts` reads the webhook URL through `getConfig()` at call time
 - [x] Git-ignore local SQLite files (`*.db`, journal/WAL files)
 - [x] Run Prettier on `roadmap.md` so `npm run format:check` passes
 
-## 16.2 Automated tests — proposed
+## 16.2 Automated tests (proposed)
 
 Add **Vitest** (TypeScript + ESM out of the box) with unit tests for the pure rules:
 
@@ -941,24 +928,13 @@ Add **Vitest** (TypeScript + ESM out of the box) with unit tests for the pure ru
 - [ ] Deduplication keys (same event → same key; escalated event → new key)
 - [ ] `npm test` script and a GitHub Actions workflow running typecheck, format check and tests
 
-## 16.3 Minimal subscription command in the MVP — proposed
+## 16.3 Minimal subscription command in the MVP (proposed)
 
 The MVP supports multiple users, but without the bot users can only be added by editing the
 database. Proposal: move a minimal `/subscribe` and `/unsubscribe` into the MVP (or provide a
 small CLI/seed script), so the group can use it without touching SQLite.
 
-## 16.4 Cancellation grace period — proposed
-
-For §14's open question (cancellation at 09:15 when the window ends at 09:00): add a
-configurable per-subscription grace period (e.g. 30 min) that applies to cancellations only.
-
-## 16.5 Delay statistics instead of no history — proposed
-
-Instead of dropping historical observations entirely, keep a small daily aggregate per train
-(runs, delayed runs, cancellations, average delay) and apply a retention policy to raw
-observations. Enables "how often is the RE11 late?" later with little storage.
-
-## 16.6 Docker in Phase 1 — proposed
+## 16.4 Docker in Phase 1 (proposed)
 
 Since every user hosts the service themselves, a one-command setup lowers the barrier a lot.
 Proposal: add Docker as part of Phase 1 (listed there as _proposed_ items) rather than leaving it
@@ -969,9 +945,3 @@ for deployment later, so everyone develops and runs the same environment from th
 - README section: `cp .env.example .env && docker compose up -d`
 
 Open question: Docker in Phase 1, or later with production deployment?
-
-## 16.7 Contribution offer
-
-@iamAdarshh is interested in taking **Phase 7 (natural-language scheduling with Ollama + Zod)**,
-ideally as an optional feature so hosts without a local LLM can still run the service. Until then,
-happy to help with tests (16.2), the bot commands, or Docker.
