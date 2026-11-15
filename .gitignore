@@ -149,3 +149,7 @@ vite.config.ts.timestamp-*
 .turbo
 
 /generated/prisma
+
+# Claude Code personal files (shared config lives in .claude/settings.json and CLAUDE.md)
+.claude/settings.local.json
+CLAUDE.local.md

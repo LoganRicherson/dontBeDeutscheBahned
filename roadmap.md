@@ -894,3 +894,61 @@ I'd actually implement the database, API integration and notification service be
 **The architectural principle I'd preserve throughout:** Deutsche Bahn integration, train monitoring, subscription management, scheduling and notifications should all be independent services. Discord should simply be one way of interacting with those services.
 
 This will let the project grow from a small train-monitoring script into a multi-user application without needing to rewrite its foundation.
+---
+
+# 16. Proposed additions (pending maintainer confirmation)
+
+> Proposed by @iamAdarshh. Nothing below is agreed yet — each item can be accepted, changed or
+> dropped independently. Once accepted, items can move into the relevant phase above.
+
+## 16.1 AI-assisted development setup — included in this PR
+
+Shared Claude Code configuration so contributors using AI tools get the same project context and
+conventions. Contributors who don't use Claude Code can ignore it; `REVIEW.md` is useful for
+human reviews too.
+
+- [x] `CLAUDE.md`: project overview, commands, conventions, domain rules, security rules
+- [x] `REVIEW.md`: review checklist (train logic, notifications, reliability, security, data model)
+- [x] `.claude/settings.json`: safe command permissions, blocks reading `.env` and `dev.db`,
+      auto-formats edited files with Prettier / `prisma format`
+- [x] Skills: `prisma-change`, `db-api`, `review-changes`, `roadmap-task`
+- [x] Agent: `code-reviewer` (independent read-only review before a PR)
+- [x] Personal files (`.claude/settings.local.json`, `CLAUDE.local.md`) are git-ignored
+
+## 16.2 Automated tests — proposed
+
+Add **Vitest** (TypeScript + ESM out of the box) with unit tests for the pure rules:
+
+- [ ] Delay calculation (including missing forecast)
+- [ ] Route matching (line serves both stations, correct direction)
+- [ ] Schedule evaluation (weekday, window boundaries, multiple windows, DST, midnight)
+- [ ] Deduplication keys (same event → same key; escalated event → new key)
+- [ ] `npm test` script and a GitHub Actions workflow running typecheck, format check and tests
+
+## 16.3 Minimal subscription command in the MVP — proposed
+
+The MVP supports multiple users, but without the bot users can only be added by editing the
+database. Proposal: move a minimal `/subscribe` and `/unsubscribe` into the MVP (or provide a
+small CLI/seed script), so the group can use it without touching SQLite.
+
+## 16.4 Cancellation grace period — proposed
+
+For §14's open question (cancellation at 09:15 when the window ends at 09:00): add a
+configurable per-subscription grace period (e.g. 30 min) that applies to cancellations only.
+
+## 16.5 Delay statistics instead of no history — proposed
+
+Instead of dropping historical observations entirely, keep a small daily aggregate per train
+(runs, delayed runs, cancellations, average delay) and apply a retention policy to raw
+observations. Enables "how often is the RE11 late?" later with little storage.
+
+## 16.6 Docker Compose — proposed
+
+- [ ] `Dockerfile` + `docker-compose.yml` with a volume for the SQLite database
+- [ ] One-command setup documented in the README (`cp .env.example .env && docker compose up -d`)
+
+## 16.7 Contribution offer
+
+@iamAdarshh is interested in taking **Phase 7 (natural-language scheduling with Ollama + Zod)**,
+ideally as an optional feature so hosts without a local LLM can still run the service. Until then,
+happy to help with tests (16.2), the bot commands, or Docker.
