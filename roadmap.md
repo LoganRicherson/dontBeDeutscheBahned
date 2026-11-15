@@ -25,21 +25,21 @@ The architecture should also allow future expansion into a Discord bot with natu
 
 # 2. Technology stack
 
-| Component | Technology | Purpose |
-|---|---|---|
-| Runtime | Node.js | Application runtime |
-| Language | TypeScript | Application logic |
-| Module system | ES Modules | Modern JavaScript imports |
-| Module configuration | NodeNext | Native Node.js ESM compatibility |
-| Database | SQLite | Local persistent storage |
-| ORM | Prisma 7 | Database access and migrations |
-| Database adapter | better-sqlite3 adapter | SQLite runtime connection |
-| API | Deutsche Bahn OpenBoards | Train departure information |
-| Notifications | Discord webhook | Deliver alerts |
-| HTTP server | Node.js `http` | Local testing interface |
-| Formatting | Prettier + Prisma formatter | Consistent code formatting |
-| Validation | Zod (planned) | Validate external and LLM-generated data |
-| Future LLM | Ollama (planned) | Natural-language schedule parsing |
+| Component            | Technology                  | Purpose                                  |
+| -------------------- | --------------------------- | ---------------------------------------- |
+| Runtime              | Node.js                     | Application runtime                      |
+| Language             | TypeScript                  | Application logic                        |
+| Module system        | ES Modules                  | Modern JavaScript imports                |
+| Module configuration | NodeNext                    | Native Node.js ESM compatibility         |
+| Database             | SQLite                      | Local persistent storage                 |
+| ORM                  | Prisma 7                    | Database access and migrations           |
+| Database adapter     | better-sqlite3 adapter      | SQLite runtime connection                |
+| API                  | Deutsche Bahn OpenBoards    | Train departure information              |
+| Notifications        | Discord webhook             | Deliver alerts                           |
+| HTTP server          | Node.js `http`              | Local testing interface                  |
+| Formatting           | Prettier + Prisma formatter | Consistent code formatting               |
+| Validation           | Zod (planned)               | Validate external and LLM-generated data |
+| Future LLM           | Ollama (planned)            | Natural-language schedule parsing        |
 
 ### Important configuration decisions
 
@@ -93,17 +93,17 @@ The API request should retrieve departures for configured stations and include:
 
 The initial routes of interest are:
 
-| Train | Route |
-|---|---|
-| RB89 | Lippstadt ↔ Paderborn |
-| RE11 | Lippstadt ↔ Paderborn |
+| Train | Route                 |
+| ----- | --------------------- |
+| RB89  | Lippstadt ↔ Paderborn |
+| RE11  | Lippstadt ↔ Paderborn |
 
 Station identifiers:
 
-| Station | EVA number |
-|---|---|
-| Paderborn Hbf | `8000297` |
-| Lippstadt | `8000571` |
+| Station       | EVA number |
+| ------------- | ---------- |
+| Paderborn Hbf | `8000297`  |
+| Lippstadt     | `8000571`  |
 
 **Important:** The API response must be checked to establish whether a particular service actually serves both stations. Do not assume that every RB89 or RE11 departure is relevant simply because it has the correct line designation.
 
@@ -122,14 +122,14 @@ A native recursive `setTimeout` scheduler is preferred over adding a scheduling 
 
 The monitoring service should identify:
 
-| Event | Description |
-|---|---|
-| On time | No meaningful departure delay |
-| Delayed | Departure forecast differs from schedule |
-| Cancelled | Service is cancelled |
-| Replacement bus | Train service replaced by bus |
+| Event            | Description                                       |
+| ---------------- | ------------------------------------------------- |
+| On time          | No meaningful departure delay                     |
+| Delayed          | Departure forecast differs from schedule          |
+| Cancelled        | Service is cancelled                              |
+| Replacement bus  | Train service replaced by bus                     |
 | Platform changed | Forecast platform differs from scheduled platform |
-| Unknown | Insufficient information to determine status |
+| Unknown          | Insufficient information to determine status      |
 
 The application should compare scheduled and forecast values rather than relying solely on a single API field.
 
@@ -186,13 +186,13 @@ Each subscription should have independent notification settings.
 
 ### Subscription preferences
 
-| Setting | Description | Default |
-|---|---|---|
-| Enabled | Whether subscription is active | `true` |
-| Delay threshold | Minimum delay before notification | 10 minutes |
-| Notify cancellations | Send cancellation alerts | `true` |
-| Notify replacement buses | Send replacement-bus alerts | `true` |
-| Notify platform changes | Send platform-change alerts | `false` |
+| Setting                  | Description                       | Default    |
+| ------------------------ | --------------------------------- | ---------- |
+| Enabled                  | Whether subscription is active    | `true`     |
+| Delay threshold          | Minimum delay before notification | 10 minutes |
+| Notify cancellations     | Send cancellation alerts          | `true`     |
+| Notify replacement buses | Send replacement-bus alerts       | `true`     |
+| Notify platform changes  | Send platform-change alerts       | `false`    |
 
 A user should only receive notifications for routes to which they are subscribed.
 
@@ -225,15 +225,15 @@ Europe/Berlin
 
 Weekdays should use ISO numbering:
 
-| Day | Value |
-|---|---:|
-| Monday | 1 |
-| Tuesday | 2 |
-| Wednesday | 3 |
-| Thursday | 4 |
-| Friday | 5 |
-| Saturday | 6 |
-| Sunday | 7 |
+| Day       | Value |
+| --------- | ----: |
+| Monday    |     1 |
+| Tuesday   |     2 |
+| Wednesday |     3 |
+| Thursday  |     4 |
+| Friday    |     5 |
+| Saturday  |     6 |
+| Sunday    |     7 |
 
 ### Example
 
@@ -295,17 +295,17 @@ prisma/dev.db
 
 ## 6.1 Planned Prisma models
 
-| Model | Responsibility |
-|---|---|
-| `User` | Stores logical users |
-| `Station` | Stores stations and identifiers |
-| `LocalizedStationName` | Stores translated station names |
-| `Line` | Stores train lines |
-| `MonitoredRoute` | Defines monitored origin/destination routes |
-| `UserRouteSubscription` | Connects users to routes and stores preferences |
-| `UserNotificationSchedule` | Stores individual notification time windows |
-| `DepartureObservation` | Stores observed train departures and their status |
-| `TrainAlert` | Stores generated alerts and deduplication information |
+| Model                      | Responsibility                                        |
+| -------------------------- | ----------------------------------------------------- |
+| `User`                     | Stores logical users                                  |
+| `Station`                  | Stores stations and identifiers                       |
+| `LocalizedStationName`     | Stores translated station names                       |
+| `Line`                     | Stores train lines                                    |
+| `MonitoredRoute`           | Defines monitored origin/destination routes           |
+| `UserRouteSubscription`    | Connects users to routes and stores preferences       |
+| `UserNotificationSchedule` | Stores individual notification time windows           |
+| `DepartureObservation`     | Stores observed train departures and their status     |
+| `TrainAlert`               | Stores generated alerts and deduplication information |
 
 ### Relationships
 
@@ -411,22 +411,22 @@ This is a development/testing tool, not a production frontend.
 
 ## 8.1 Planned GUI controls
 
-| Control | Purpose |
-|---|---|
-| Route ID | Select the route being tested |
-| Delay minutes | Specify a simulated delay |
-| New platform | Specify a simulated platform |
-| Simulate delay | Generate a delay event |
-| Simulate cancellation | Generate a cancellation event |
-| Change platform | Generate a platform-change event |
-| Reset simulation | Clear simulated state |
+| Control               | Purpose                          |
+| --------------------- | -------------------------------- |
+| Route ID              | Select the route being tested    |
+| Delay minutes         | Specify a simulated delay        |
+| New platform          | Specify a simulated platform     |
+| Simulate delay        | Generate a delay event           |
+| Simulate cancellation | Generate a cancellation event    |
+| Change platform       | Generate a platform-change event |
+| Reset simulation      | Clear simulated state            |
 
 ## 8.2 HTTP endpoints
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/` | Serve testing GUI |
-| POST | `/api/test-event` | Trigger simulated event |
+| Method | Endpoint          | Purpose                 |
+| ------ | ----------------- | ----------------------- |
+| GET    | `/`               | Serve testing GUI       |
+| POST   | `/api/test-event` | Trigger simulated event |
 
 The test endpoint should validate its input and return JSON responses.
 
@@ -455,14 +455,14 @@ Eventually, users should be able to interact with the application through Discor
 
 Potential commands:
 
-| Command | Purpose |
-|---|---|
-| `/subscribe` | Subscribe to a train route |
-| `/unsubscribe` | Remove a subscription |
-| `/routes` | List available routes |
-| `/subscriptions` | View personal subscriptions |
-| `/schedule` | Configure notification schedules |
-| `/settings` | Change notification preferences |
+| Command          | Purpose                          |
+| ---------------- | -------------------------------- |
+| `/subscribe`     | Subscribe to a train route       |
+| `/unsubscribe`   | Remove a subscription            |
+| `/routes`        | List available routes            |
+| `/subscriptions` | View personal subscriptions      |
+| `/schedule`      | Configure notification schedules |
+| `/settings`      | Change notification preferences  |
 
 The bot should identify users through their Discord IDs.
 
@@ -529,12 +529,12 @@ DB_API_KEY="your_api_key"
 
 DISCORD_WEBHOOK_URL="your_discord_webhook"
 
-DATABASE_URL="file:./dev.db"
+DATABASE_URL="file:./prisma/dev.db"
 
 CHECK_INTERVAL_MINUTES=2
 ```
 
-Note: With Prisma 7, the database URL is configured in `prisma.config.ts`. If you use a literal URL there, `DATABASE_URL` is not required. Choose one configuration approach and keep it consistent.
+Note: `DATABASE_URL` is the single source of truth. `prisma.config.ts` reads it with `env('DATABASE_URL')` (loaded via `dotenv`), and the application reads it through `src/config/env.ts`. In Prisma 7, relative SQLite paths resolve from the `prisma.config.ts` directory (the project root), so `file:./prisma/dev.db` places the database at `prisma/dev.db`.
 
 ## 10.2 Runtime configuration
 
@@ -684,6 +684,12 @@ Tasks:
 - [ ] Create application entry point.
 - [ ] Establish logging and graceful shutdown.
 
+Proposed additions (pending maintainer confirmation, see §16.6):
+
+- [ ] _(proposed)_ Add a `Dockerfile` (multi-stage, Node LTS, runs migrations then starts the app).
+- [ ] _(proposed)_ Add `docker-compose.yml` with a volume for the SQLite database and `env_file: .env`.
+- [ ] _(proposed)_ Document one-command setup in the README: `cp .env.example .env && docker compose up -d`.
+
 **Completion criteria:** Application starts, Prisma connects to SQLite, and database migrations work.
 
 ## Phase 2 — Database and data models
@@ -807,18 +813,18 @@ Tasks:
 
 These requirements apply throughout development.
 
-| Requirement | Specification |
-|---|---|
-| Reliability | Temporary API failures must not crash the application |
-| Performance | Monitoring should not overlap |
-| Persistence | Observations and subscriptions survive restarts |
-| Security | API credentials and webhook URL remain secret |
-| Privacy | Only necessary Discord user information is stored |
-| Modularity | Business logic is independent of Discord |
-| Extensibility | Future bot and LLM integration requires minimal restructuring |
-| Testability | Simulated events must be independent of real train data |
-| Time handling | All user schedules use `Europe/Berlin` |
-| Maintainability | Strong TypeScript typing and consistent formatting |
+| Requirement     | Specification                                                 |
+| --------------- | ------------------------------------------------------------- |
+| Reliability     | Temporary API failures must not crash the application         |
+| Performance     | Monitoring should not overlap                                 |
+| Persistence     | Observations and subscriptions survive restarts               |
+| Security        | API credentials and webhook URL remain secret                 |
+| Privacy         | Only necessary Discord user information is stored             |
+| Modularity      | Business logic is independent of Discord                      |
+| Extensibility   | Future bot and LLM integration requires minimal restructuring |
+| Testability     | Simulated events must be independent of real train data       |
+| Time handling   | All user schedules use `Europe/Berlin`                        |
+| Maintainability | Strong TypeScript typing and consistent formatting            |
 
 ---
 
@@ -826,18 +832,18 @@ These requirements apply throughout development.
 
 There are a few areas where I'd avoid making assumptions before implementation.
 
-| Question | Current proposal |
-|---|---|
-| Should monitoring cover both directions? | Yes |
-| Should all users share one Discord channel? | Yes, initially |
-| Should users be mentioned individually? | Yes |
-| Should notifications be sent outside configured schedules for cancellations? | Not decided |
-| Should delays be notified again if they increase significantly? | Yes, subject to deduplication rules |
-| Should historical departure observations be retained indefinitely? | Probably not; introduce a retention policy |
-| Should the application support overnight schedules? | Eventually, yes |
-| Should the test interface run in production? | No |
-| Should the LLM be local? | Yes, when implemented |
-| Should the application have a web frontend? | No requirement |
+| Question                                                                     | Current proposal                           |
+| ---------------------------------------------------------------------------- | ------------------------------------------ |
+| Should monitoring cover both directions?                                     | Yes                                        |
+| Should all users share one Discord channel?                                  | Yes, initially                             |
+| Should users be mentioned individually?                                      | Yes                                        |
+| Should notifications be sent outside configured schedules for cancellations? | Not decided                                |
+| Should delays be notified again if they increase significantly?              | Yes, subject to deduplication rules        |
+| Should historical departure observations be retained indefinitely?           | Probably not; introduce a retention policy |
+| Should the application support overnight schedules?                          | Eventually, yes                            |
+| Should the test interface run in production?                                 | No                                         |
+| Should the LLM be local?                                                     | Yes, when implemented                      |
+| Should the application have a web frontend?                                  | No requirement                             |
 
 Two particularly important decisions:
 
@@ -876,18 +882,18 @@ I would consider the first usable release complete when the following works:
 
 I'd prioritize the work in this order:
 
-| Priority | Component | Reason |
-|---|---|---|
-| 1 | Stable Prisma 7 installation | Foundation for everything else |
-| 2 | Database schema and migrations | Establish data relationships |
-| 3 | Deutsche Bahn API client | Get real train data |
-| 4 | Train monitoring service | Detect meaningful changes |
-| 5 | Discord notification service | Deliver useful information |
-| 6 | User subscription and schedule logic | Personalize notifications |
-| 7 | Testing interface | Make development and debugging easier |
-| 8 | Production deployment | Run continuously |
-| 9 | Discord bot | Add interaction |
-| 10 | Local LLM | Add natural-language management |
+| Priority | Component                            | Reason                                |
+| -------- | ------------------------------------ | ------------------------------------- |
+| 1        | Stable Prisma 7 installation         | Foundation for everything else        |
+| 2        | Database schema and migrations       | Establish data relationships          |
+| 3        | Deutsche Bahn API client             | Get real train data                   |
+| 4        | Train monitoring service             | Detect meaningful changes             |
+| 5        | Discord notification service         | Deliver useful information            |
+| 6        | User subscription and schedule logic | Personalize notifications             |
+| 7        | Testing interface                    | Make development and debugging easier |
+| 8        | Production deployment                | Run continuously                      |
+| 9        | Discord bot                          | Add interaction                       |
+| 10       | Local LLM                            | Add natural-language management       |
 
 I'd actually implement the database, API integration and notification service before spending much time on the test GUI. That way, the GUI can exercise real application logic rather than becoming a separate testing implementation.
 
@@ -914,6 +920,16 @@ human reviews too.
 - [x] Skills: `prisma-change`, `db-api`, `review-changes`, `roadmap-task`
 - [x] Agent: `code-reviewer` (independent read-only review before a PR)
 - [x] Personal files (`.claude/settings.local.json`, `CLAUDE.local.md`) are git-ignored
+
+## 16.1a Configuration fixes — included in this PR
+
+- [x] Add `dotenv` to dependencies (`prisma.config.ts` already imported it)
+- [x] Use `DATABASE_URL` as the single database URL (`env('DATABASE_URL')` in `prisma.config.ts`);
+      default changed to `file:./prisma/dev.db` so the DB lands in `prisma/` under Prisma 7
+- [x] `src/config/env.ts`: validated config via `getConfig()` (Zod can replace this later)
+- [x] `discord.ts` reads the webhook URL through `getConfig()` at call time
+- [x] Git-ignore local SQLite files (`*.db`, journal/WAL files)
+- [x] Run Prettier on `roadmap.md` so `npm run format:check` passes
 
 ## 16.2 Automated tests — proposed
 
@@ -942,10 +958,17 @@ Instead of dropping historical observations entirely, keep a small daily aggrega
 (runs, delayed runs, cancellations, average delay) and apply a retention policy to raw
 observations. Enables "how often is the RE11 late?" later with little storage.
 
-## 16.6 Docker Compose — proposed
+## 16.6 Docker in Phase 1 — proposed
 
-- [ ] `Dockerfile` + `docker-compose.yml` with a volume for the SQLite database
-- [ ] One-command setup documented in the README (`cp .env.example .env && docker compose up -d`)
+Since every user hosts the service themselves, a one-command setup lowers the barrier a lot.
+Proposal: add Docker as part of Phase 1 (listed there as _proposed_ items) rather than leaving it
+for deployment later, so everyone develops and runs the same environment from the start.
+
+- `Dockerfile` (multi-stage, Node LTS) that runs `prisma migrate deploy` and then starts the app
+- `docker-compose.yml` with a named volume for the SQLite database and `env_file: .env`
+- README section: `cp .env.example .env && docker compose up -d`
+
+Open question: Docker in Phase 1, or later with production deployment?
 
 ## 16.7 Contribution offer
 

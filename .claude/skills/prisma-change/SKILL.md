@@ -13,7 +13,8 @@ Prisma tutorials:
   Import it from there, e.g. `import { PrismaClient } from '../../generated/prisma/client.js';`
   — check the generated folder for the exact entry file rather than guessing.
 - The client is created with the adapter, not a plain `new PrismaClient()`.
-- Only one place should define the database URL (`prisma.config.ts` or `DATABASE_URL`), not both.
+- `DATABASE_URL` in `.env` is the single source of the database location; `prisma.config.ts`
+  reads it. Relative SQLite paths resolve from the project root in Prisma 7.
 
 ## Steps
 

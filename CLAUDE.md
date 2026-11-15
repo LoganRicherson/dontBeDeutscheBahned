@@ -34,6 +34,8 @@ There is no test runner yet. Until one exists, "done" means `npm run typecheck` 
 
 - Node.js, TypeScript (strict), ES Modules with `module`/`moduleResolution: NodeNext`
 - Prisma 7 with the `better-sqlite3` driver adapter, SQLite at `prisma/dev.db`
+- `DATABASE_URL` in `.env` is the only place the DB location is set (`file:./prisma/dev.db`).
+  Prisma 7 resolves relative SQLite paths from the project root (where `prisma.config.ts` is).
 - Prisma client is generated to `generated/prisma` (git-ignored), not `node_modules/@prisma/client`
 - Deutsche Bahn OpenBoards API (departures), authenticated with `DB_CLIENT_ID` + `DB_API_KEY`
 - Discord webhook for notifications (bot comes later, Phase 6)
@@ -45,7 +47,7 @@ There is no test runner yet. Until one exists, "done" means `npm run typecheck` 
 prisma/schema.prisma          data model (users, stations, routes, subscriptions, schedules, observations, alerts)
 prisma.config.ts              Prisma 7 config (schema path, migrations, datasource)
 src/index.ts                  entry point
-src/config/env.ts             env loading/validation
+src/config/env.ts             getConfig(): loads .env (dotenv) and validates
 src/db/prisma.ts              Prisma client instance
 src/services/db-api.ts        Deutsche Bahn API client
 src/services/train-monitor.ts polling + status detection
@@ -66,7 +68,8 @@ unprompted.
   place where rules live. Same for the future LLM layer: it produces validated input, nothing more.
 - Prefer small pure functions for rules (delay calculation, schedule matching, dedupe keys) so
   they're easy to test once a test runner is added.
-- Read config through `src/config/env.ts`, not `process.env` scattered across modules.
+- Read config through `getConfig()` from `src/config/env.ts`, not `process.env` scattered
+  across modules. Call it at use time, not at module top level.
 
 ## Domain rules (easy to get wrong)
 
